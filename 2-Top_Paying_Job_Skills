@@ -1,0 +1,38 @@
+/*
+Question:
+What specific skills are required for the absolute highest-paying 
+remote Business Analyst roles in the market?
+
+Architectural Value:
+Provides a clean, data-driven mapping of salary ceilings to technical 
+tool stacks, bypassing noisy data from lower-paying job brackets.
+  */
+
+WITH TOP_JOBS AS (
+    SELECT
+        job_id,
+        job_title_short,
+        salary_year_avg,
+        name AS company
+    FROM job_postings_fact
+    LEFT JOIN company_dim ON job_postings_fact.company_id = company_dim.company_id
+    WHERE job_title_short = 'Business Analyst'
+      AND job_location = 'Anywhere'
+      AND salary_year_avg IS NOT NULL 
+    ORDER BY salary_year_avg DESC
+    LIMIT 5
+)
+
+SELECT
+top_jobs.*,
+  s.skills AS skills
+FROM TOP_JOBS
+INNER JOIN skills_job_dim sj ON TOP_JOBS.job_id = sj.job_id
+INNER JOIN skills_dim s ON sj.skill_id = s.skill_id  
+LIMIT 5;
+  
+
+ 
+
+
+ 

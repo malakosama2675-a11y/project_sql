@@ -1,0 +1,21 @@
+
+--Question: 
+--What are the top 5 most in-demand skills for Business Analyst roles across 
+--all recorded job postings?
+
+--Architectural Value:
+-- Identifies the tools and technologies with the highest market frequency, 
+-- guiding job seekers on which competencies maximize marketability.
+
+
+SELECT
+    s.skills AS skill_name,
+    COUNT(sj.job_id) AS demand_count
+FROM job_postings_fact jpf 
+INNER JOIN skills_job_dim sj ON jpf.job_id = sj.job_id
+INNER JOIN skills_dim s ON sj.skill_id = s.skill_id  
+WHERE jpf.job_title_short = 'Business Analyst'
+GROUP BY s.skills 
+ORDER BY demand_count DESC
+LIMIT 5; 
+ 

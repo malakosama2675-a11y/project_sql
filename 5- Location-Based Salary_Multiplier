@@ -1,0 +1,27 @@
+/*
+Question: 
+What is the average salary difference for a Business Analyst role when the 
+location is listed as 'Anywhere' (Remote) VS specific office locations?
+
+Architectural Value:
+- Quantifies the remote premium vs. cost-of-living salary adjustments.
+- Provides data-backed baselines for work-setting compensation models
+*/
+
+ with location_salary AS (
+  SELECT
+    job_id,
+    salary_year_avg,
+CASE WHEN job_location =  'Anywhere' THEN 'Remote'
+  ELSE 
+ 'Office' END AS location_setting
+ FROM job_postings_fact
+ WHERE job_title_short = 'Business Analyst' 
+ AND salary_year_avg IS NOT NULL
+ )
+ SELECT location_setting,
+round(avg(salary_year_avg),2) AS avg_salary,
+COUNT(job_id) AS job_count
+FROM location_salary
+GROUP BY location_setting;
+ 

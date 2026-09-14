@@ -1,0 +1,38 @@
+/*
+Question: 
+For job postings requiring Python, what is the average salary compared to 
+jobs that only require SQL without Python?
+
+Architectural Value:
+Quantifies the financial return of adding programming capabilities (Python) 
+  to basic database capabilities (SQL)..
+*/
+
+WITH job_skills_check AS (
+    SELECT 
+        jpf.job_id,
+        jpf.salary_year_avg,
+        MAX(CASE WHEN s.skills = 'python' THEN 1 ELSE 0 END) AS has_python,
+        MAX(CASE WHEN s.skills = 'sql' THEN 1 ELSE 0 END) AS has_sql
+    FROM job_postings_fact jpf
+    INNER JOIN skills_job_dim sj ON jpf.job_id = sj.job_id
+    INNER JOIN skills_dim s ON sj.skill_id = s.skill_id
+    WHERE jpf.salary_year_avg IS NOT NULL
+      AND jpf.job_title_short = 'Business Analyst' 
+    GROUP BY jpf.job_id, jpf.salary_year_avg
+)
+SELECT
+    ROUND(AVG(CASE WHEN has_python = 1 THEN salary_year_avg END), 2) AS with_python,
+    ROUND(AVG(CASE WHEN has_sql = 1 AND has_python = 0 THEN salary_year_avg END), 2) AS sql_only,
+    ROUND(
+        AVG(CASE WHEN has_python = 1 THEN salary_year_avg END) - 
+        AVG(CASE WHEN has_sql = 1 AND has_python = 0 THEN salary_year_avg END), 
+        2
+    ) AS python_premium
+FROM job_skills_check;
+ 
+ 
+
+
+
+
